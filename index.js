@@ -1,6 +1,6 @@
 const paillier = require("paillier-bigint");
 const express = require("express");
-
+require("./db/mongo")
 const app = express();
 
 app.get("/generatekeys", async function paillierTest(req, res) {
@@ -12,6 +12,7 @@ app.get("/generatekeys", async function paillierTest(req, res) {
     _p: privateKey._p,
     _q: privateKey._q,
   };
+  
   const pvtJson = JSON.stringify(pvt, (key, value) => {
     return typeof value === "bigint" ? value.toString() : value;
   });
