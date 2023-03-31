@@ -35,8 +35,23 @@ router.post("/paillier/sendmoney", async (req, res) => {
   const hashKey = req.body.hashKey;
   const isMatch = await bcrypt.compare(req.body.pvtKey, hashKey);
   var pub_key = JSON.parse(atob(transactionKey));
+  const value = req.body.value;
+  function convertToBigInt(obj) {
+    for (let key in obj) {
+      if (typeof obj[key] === 'string') {
+        obj[key] = BigInt(obj[key]);
+      } else if (typeof obj[key] === 'object') {
+        convertToBigInt(obj[key]);
+      }
+    }
+  }
+  
+convertToBigInt(pub_key);
+const publicKey = new paillier.PublicKey(pub_key.n, pub_key.g);
+const enc_value = publicKey.encrypt(value);
+console.log(enc_value)
 
-  res.send(pub_key)
+  res.send(enc_value.toString())
   if (!isMatch) {
     return res.send("Check you keys");
   }
