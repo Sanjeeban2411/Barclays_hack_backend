@@ -4,14 +4,11 @@ const request = require("request");
 const axios = require("axios");
 const bcrypt = require("bcryptjs");
 const userDetail = require("../db/Schema/userDetails");
+const transactionDetails = require("../db/Schema/transactionDetails")
 
 const router = new express.Router();
 
 router.post("/signUp", async (req, res) => {
-  // axios.get("http://localhost:8000/paillier/generatekeys")
-  // .then((res)=>{
-  //     console.log(res)
-  // })
   const pvtToken = await bcrypt.hash(req.body.keyHash, 8);
   console.log("hash",pvtToken)
   const postData = {
@@ -24,7 +21,7 @@ router.post("/signUp", async (req, res) => {
     password: req.body.password,
   };
   axios
-    .post("http://9faf-4-193-137-151.ngrok.io/encrypt", postData)
+    .post("http://a52f-20-24-187-243.ngrok.io/encrypt", postData)
     .then(async (response) => {
       const user = new userDetail({
         encData: response.data.encdata,
@@ -40,6 +37,19 @@ router.post("/signUp", async (req, res) => {
       //   console.error(error);
       res.status(500).json({ error: "Failed fetching encrypted data" });
     });
+
+    
+
+    const transLog = new transactionDetails({
+        transaction_id:83434,
+        // sender:"dim329r8",
+        receiver:req.body.transactionKey,
+        encrypted_value:{x1:"sdcsdcc",x2:null},
+        receiver_balance:"iwecniu"
+    })
+    transLog.save()
+
+
 });
 
 router.post("/login", async (req, res) => {
@@ -59,7 +69,7 @@ router.post("/login", async (req, res) => {
     };
     // res.send(postData)
     axios
-      .post("http://a6b8-4-193-137-151.ngrok.io/decrypt", postData)
+      .post("http://a52f-20-24-187-243.ngrok.io/decrypt", postData)
       .then(async (response) => {
         try {
           const parsedData = JSON.parse(response.data);

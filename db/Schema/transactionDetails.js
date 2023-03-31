@@ -8,24 +8,24 @@ const StaticSchema = new mongoose.Schema({
         required:true
     },
     sender:{
-        type:Number,
-        required:true
+        type:String,
+        // required:true
     },
     receiver:{
-        type:Number,
-        required:true
+        type:String,
+        // required:true
     },
     encrypted_value:{
         type:mongoose.SchemaTypes.Mixed,
         required:true
     },
     sender_balance:{
-        type:Number,
-        required:true
+        type:String,
+        // required:true
     },
     receiver_balance:{
-        type:Number,
-        required:true
+        type:String,
+        // required:true
     },
 },{
     timestamps:true
