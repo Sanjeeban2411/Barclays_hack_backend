@@ -31,42 +31,6 @@ router.get("/paillier/generatekeys", async (req, res) => {
   res.json({ encodedPub, encodedPvt });
 });
 
-router.post("/paillier/sendmoney", async (req, res) => {
-  const transactionKey = req.body.transactionKey; //(reciever pub key) manually entered
-  const selfTranKey = req.body.selfTranKey; //(sender pub key)
-  const hashKey = req.body.hashKey; //hasked pvt key of sender fro  db
-  const isMatch = await bcrypt.compare(req.body.pvtKey, hashKey);
-  var pub_key1 = JSON.parse(atob(transactionKey));
-  var pub_key2 = JSON.parse(atob(selfTranKey));
-  const value = req.body.value;
-  function convertToBigInt(obj) {
-    for (let key in obj) {
-      if (typeof obj[key] === "string") {
-        obj[key] = BigInt(obj[key]);
-      } else if (typeof obj[key] === "object") {
-        convertToBigInt(obj[key]);
-      }
-    }
-  }
-  
-convertToBigInt(pub_key1);
-const publicKey = new paillier.PublicKey(pub_key1.n, pub_key1.g);
-const enc_value = publicKey.encrypt(value);
-console.log(enc_value)
-
-  convertToBigInt(pub_key1);
-  convertToBigInt(pub_key2);
-  const publicKey1 = new paillier.PublicKey(pub_key1.n, pub_key1.g);
-  const publicKey2 = new paillier.PublicKey(pub_key2.n, pub_key2.g);
-  const enc_value1 = publicKey1.encrypt(value);
-  const enc_value2 = publicKey2.encrypt(value);
-  console.log({ enc_value1, enc_value2 });
-  const x = { x1: enc_value1.toString(), x2: enc_value2.toString() };
-  res.send(x);
-  if (!isMatch) {
-    return res.send("Check you keys");
-  }
-});
 
 router.get("/paillier/viewtransaction", async (req, res) => {
   const selfTranKey = req.body.selfTranKey; //(sender pub key)
@@ -104,7 +68,51 @@ console.log(privateKey)
     bal = privateKey.decrypt(enc_bal)
     console.log(transactionAmt)
     console.log(bal)
+    element.receiver_balance = bal.toString()
+    element.encrypted_value.x1 = transactionAmt.toString()
+
   });
+  res.send(trans)
 });
+
+
+router.post("/paillier/sendmoney", async (req, res) => {
+    const transactionKey = req.body.transactionKey; //(reciever pub key) manually entered
+    const selfTranKey = req.body.selfTranKey; //(sender pub key)
+    const hashKey = req.body.hashKey; //hasked pvt key of sender fro  db
+    const isMatch = await bcrypt.compare(req.body.pvtKey, hashKey);
+    var pub_key1 = JSON.parse(atob(transactionKey));
+    var pub_key2 = JSON.parse(atob(selfTranKey));
+    const value = req.body.value;
+    function convertToBigInt(obj) {
+      for (let key in obj) {
+        if (typeof obj[key] === "string") {
+          obj[key] = BigInt(obj[key]);
+        } else if (typeof obj[key] === "object") {
+          convertToBigInt(obj[key]);
+        }
+      }
+    }
+    
+  convertToBigInt(pub_key1);
+  const publicKey = new paillier.PublicKey(pub_key1.n, pub_key1.g);
+  const enc_value = publicKey.encrypt(value);
+  console.log(enc_value)
+  
+    convertToBigInt(pub_key1);
+    convertToBigInt(pub_key2);
+    const publicKey1 = new paillier.PublicKey(pub_key1.n, pub_key1.g);
+    const publicKey2 = new paillier.PublicKey(pub_key2.n, pub_key2.g);
+    const enc_value1 = publicKey1.encrypt(value);
+    const enc_value2 = publicKey2.encrypt(value);
+    console.log({ enc_value1, enc_value2 });
+    const x = { x1: enc_value1.toString(), x2: enc_value2.toString() };
+    res.send(x);
+    if (!isMatch) {
+      return res.send("Check you keys");
+    }
+  });
+
+   
 
 module.exports = router;

@@ -4,68 +4,74 @@ const request = require("request");
 const axios = require("axios");
 const bcrypt = require("bcryptjs");
 const userDetail = require("../db/Schema/userDetails");
-const transactionDetails = require("../db/Schema/transactionDetails")
+const transactionDetails = require("../db/Schema/transactionDetails");
 const paillier = require("paillier-bigint");
 
 const router = new express.Router();
 
 router.post("/signUp", async (req, res) => {
-  const pvtToken = await bcrypt.hash(req.body.keyHash, 8);
-  console.log("hash",pvtToken)
-  const postData = {
-    name: req.body.name,
-    age: req.body.age,
-    gender: req.body.gender,
-    contact: req.body.contact,
-    transactionKey: req.body.transactionKey,
-    keyHash: pvtToken,
-    password: req.body.password,
-  };
-  axios
-    .post("http://f614-20-212-13-45.ngrok.io/encrypt", postData)
-    .then(async (response) => {
-      const user = new userDetail({
-        encData: response.data.encdata,
-        aesKey_U: response.data.enc_aes_u,
-        aesKey_Bank: response.data.enc_aes_b,
-        nonce: response.data.Nonce,
-        tag: response.data.Tag,
+  try {
+    const pvtToken = await bcrypt.hash(req.body.keyHash, 8);
+    console.log("hash", pvtToken);
+    const postData = {
+      name: req.body.name,
+      age: req.body.age,
+      gender: req.body.gender,
+      contact: req.body.contact,
+      transactionKey: req.body.transactionKey,
+      keyHash: pvtToken,
+      password: req.body.password,
+    };
+    axios
+      .post("http://f614-20-212-13-45.ngrok.io/encrypt", postData)
+      .then(async (response) => {
+        const user = new userDetail({
+          encData: response.data.encdata,
+          aesKey_U: response.data.enc_aes_u,
+          aesKey_Bank: response.data.enc_aes_b,
+          nonce: response.data.Nonce,
+          tag: response.data.Tag,
+        });
+        await user.save();
+        res.json({
+          res: response.data,
+          pvt_key: req.body.keyHash,
+          hashed: pvtToken,
+        });
+      })
+      .catch((error) => {
+        //   console.error(error);
+        res.status(500).json({ error: "Failed fetching encrypted data" });
       });
-      await user.save();
-      res.json({res: response.data, pvt_key: req.body.keyHash, hashed: pvtToken});
-    })
-    .catch((error) => {
-      //   console.error(error);
-      res.status(500).json({ error: "Failed fetching encrypted data" });
-    });
 
     var pub_key1 = JSON.parse(atob(req.body.transactionKey));
     // console.log(pub_key1)
     function convertToBigInt(obj) {
       for (let key in obj) {
-        if (typeof obj[key] === 'string') {
+        if (typeof obj[key] === "string") {
           obj[key] = BigInt(obj[key]);
-        } else if (typeof obj[key] === 'object') {
+        } else if (typeof obj[key] === "object") {
           convertToBigInt(obj[key]);
         }
       }
     }
-    
-  convertToBigInt(pub_key1);
-  const publicKey = new paillier.PublicKey(pub_key1.n, pub_key1.g);
-  const enc_value = publicKey.encrypt(500);
-  const enc_x1 = btoa(publicKey.encrypt(500));
+
+    convertToBigInt(pub_key1);
+    const publicKey = new paillier.PublicKey(pub_key1.n, pub_key1.g);
+    const enc_value = publicKey.encrypt(500);
+    const enc_x1 = btoa(publicKey.encrypt(500));
     const transLog = new transactionDetails({
-        transaction_id:83434,
-        // sender:"dim329r8",
-        receiver:req.body.transactionKey,
-        encrypted_value:{x1:enc_x1,x2:null},
-        receiver_balance:enc_value
-    })
-    transLog.save()
-    console.log(enc_value, enc_x1)
-
-
+      transaction_id: 83434,
+      // sender:"dim329r8",
+      receiver: req.body.transactionKey,
+      encrypted_value: { x1: enc_x1, x2: null },
+      receiver_balance: enc_value,
+    });
+    transLog.save();
+    console.log(enc_value, enc_x1);
+  } catch (error) {
+    res.send(error);
+  }
 });
 
 router.post("/login", async (req, res) => {
@@ -75,7 +81,7 @@ router.post("/login", async (req, res) => {
     if (!user) {
       return res.send("No data found, please recheck your credentials");
     }
-    console.log(user)
+    console.log(user);
     const postData = {
       enc_data_: user.encData,
       pvt_key_: req.body.pvt_key_,
