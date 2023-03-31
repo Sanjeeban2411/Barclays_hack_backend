@@ -22,9 +22,9 @@ const paillier = require("paillier-bigint");
 //   });
 //   const outputPvt = JSON.parse(pvtJson);
 
-//   const pubJson = JSON.stringify(pub, (key, value) => {
-//     return typeof value === "bigint" ? value.toString() : value;
-//   });
+  // const pubJson = JSON.stringify(pub, (key, value) => {
+  //   return typeof value === "bigint" ? value.toString() : value;
+  // });
 //   const outputPub = JSON.parse(pubJson);
 
 //   res.send({ outputPub, outputPvt });

@@ -2,6 +2,7 @@ const paillier = require("paillier-bigint");
 const express = require("express");
 require("./db/mongo")
 const userRoutes = require('./routes/user')
+const transactionRoutes = require('./routes/transactions')
 const app = express();
 
 // app.get("/generatekeys", async function paillierTest(req, res) {
@@ -29,6 +30,7 @@ const app = express();
 
 app.use(express.json())
 app.use(userRoutes)
+app.use(transactionRoutes)
 
 app.listen(8000, () => {
   console.log("listening on 8000");
