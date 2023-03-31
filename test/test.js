@@ -28,41 +28,29 @@ convertToBigInt(response);
   
 
 // console.log(response)
-const privateKey = response.privateKeyJson;
-const publicKey = response.publicKeyJson;
+const privateKeyJson = response.privateKeyJson;
+const publicKeyJson = response.publicKeyJson;
 // console.log(response.publicKeyJson.g)
 
+const publicKey = new paillier.PublicKey(publicKeyJson.n, publicKeyJson.g)
+const privateKey = new paillier.PrivateKey(privateKeyJson.lambda, privateKeyJson.mu, publicKey, privateKeyJson._p, privateKeyJson._q )
 
-// const publicKey = new paillier.PublicKey(
-//   response.publicKeyJson.n,
-//   response.publicKeyJson._n,
-//   response.publicKeyJson.g
-// );
 
-// console.log(publicKey)
+let a = -40;
+let b = 100;
 
-// const privateKey = new paillier.PrivateKey(
-//   BigInt(JSON.parse(privateKeyJson).lambda),
-//   BigInt(JSON.parse(privateKeyJson).mu),
-//   BigInt(JSON.parse(privateKeyJson)._p),
-//   (BigInt(JSON.parse(privateKeyJson)._q)), 
-//   publicKey
-// );
 
-// console.log(publicKey, privateKey)
+const a1 = publicKey.encrypt(a);
+const b1 = publicKey.encrypt(b);
 
-// // let a = BigInt(40);
-// // let b = BigInt(100);
 
-// //   // a = a*(-1)
-// // const a1 = publicKey.encrypt(a);
-// // const b1 = publicKey.encrypt(b);
 
-// //   console.log("A1", a1)
-// //   console.log("B1", b1)
+const sum = publicKey.addition(a1, b1)
+console.log(sum)
 
-// //   const decryptedA = privateKey.decrypt(BigInt(a1));
-// //   const decryptedB = privateKey.decrypt(BigInt(b1));
+
+const decryptedA = privateKey.decrypt(sum);
+
   
-// //   console.log(decryptedA);
+  console.log(decryptedA);
 // //   console.log(decryptedB);
