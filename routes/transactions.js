@@ -77,8 +77,33 @@ router.get("/paillier/viewtransaction", async (req, res) => {
   }
   const trans = await transactionDetails.find({receiver:selfTranKey})
 //   res.send(trans)
+var pvt_key1 = JSON.parse(atob(req.body.pvtKey));
+var pub_key1 = JSON.parse(atob(req.body.selfTranKey));
+// console.log(pub_key1)
+function convertToBigInt(obj) {
+  for (let key in obj) {
+    if (typeof obj[key] === "string") {
+      obj[key] = BigInt(obj[key]);
+    } else if (typeof obj[key] === "object") {
+      convertToBigInt(obj[key]);
+    }
+  }
+}
+
+convertToBigInt(pvt_key1)
+convertToBigInt(pub_key1)
+const publicKey = new paillier.PublicKey(pub_key1.n, pub_key1.g)
+const privateKey = new paillier.PrivateKey(pvt_key1.lambda, pvt_key1.mu, publicKey, pvt_key1._p, pvt_key1._q )
+
+console.log(privateKey)
   trans.forEach(element => {
-    element.receiver_balance
+
+    enc_transactionAmt = BigInt(element.encrypted_value.x1)
+    transactionAmt = privateKey.decrypt(enc_transactionAmt)
+    enc_bal = BigInt(element.receiver_balance)
+    bal = privateKey.decrypt(enc_bal)
+    console.log(transactionAmt)
+    console.log(bal)
   });
 });
 

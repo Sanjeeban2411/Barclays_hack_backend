@@ -54,15 +54,16 @@ router.post("/signUp", async (req, res) => {
   convertToBigInt(pub_key1);
   const publicKey = new paillier.PublicKey(pub_key1.n, pub_key1.g);
   const enc_value = publicKey.encrypt(500);
-  console.log(enc_value)
+  const enc_x1 = btoa(publicKey.encrypt(500));
     const transLog = new transactionDetails({
         transaction_id:83434,
         // sender:"dim329r8",
         receiver:req.body.transactionKey,
-        encrypted_value:{x1:enc_value,x2:null},
+        encrypted_value:{x1:enc_x1,x2:null},
         receiver_balance:enc_value
     })
     transLog.save()
+    console.log(enc_value, enc_x1)
 
 
 });
