@@ -34,7 +34,7 @@ router.post("/paillier/sendmoney", async (req, res) => {
   const transactionKey = req.body.transactionKey; //(reciever) manually entered
   const hashKey = req.body.hashKey;
   const isMatch = await bcrypt.compare(req.body.pvtKey, hashKey);
-  var pub_key = JSON.parse(atob(transactionKey));
+  var pub_key1 = JSON.parse(atob(transactionKey));
   const value = req.body.value;
   function convertToBigInt(obj) {
     for (let key in obj) {
@@ -46,8 +46,8 @@ router.post("/paillier/sendmoney", async (req, res) => {
     }
   }
   
-convertToBigInt(pub_key);
-const publicKey = new paillier.PublicKey(pub_key.n, pub_key.g);
+convertToBigInt(pub_key1);
+const publicKey = new paillier.PublicKey(pub_key1.n, pub_key1.g);
 const enc_value = publicKey.encrypt(value);
 console.log(enc_value)
 
