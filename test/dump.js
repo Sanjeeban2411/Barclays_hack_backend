@@ -9,7 +9,6 @@ const paillier = require("paillier-bigint");
 // // })();
 
 // app.get("/generatekeys", async function paillierTest(req, res) {
-//   // async function paillierTest(req, res) {
 //   const { publicKey, privateKey } = await paillier.generateRandomKeys(64);
 //   const pub = publicKey;
 //   const pvt = {
@@ -27,13 +26,15 @@ const paillier = require("paillier-bigint");
 //     return typeof value === "bigint" ? value.toString() : value;
 //   });
 //   const outputPub = JSON.parse(pubJson);
-//   // }
+
 //   res.send({ outputPub, outputPvt });
 // });
 
-// app.listen(8000, () => {
-//   console.log("listening on 8000");
+// app.listen(8080, () => {
+//   console.log("listening on 8080");
 // });
+
+
 
 async function paillierTest(req, res) {
   const { publicKey, privateKey } = await paillier.generateRandomKeys(32)
@@ -49,8 +50,6 @@ async function paillierTest(req, res) {
   console.log("A1", a1)
   console.log("B1", b1)
 
-  // const b2  =publicKey.multiply(b1,-1)
-
   // const diff =publicKey.addition(a1, b2);
   // console.log("diff",privateKey.decrypt(diff))
 
@@ -60,10 +59,13 @@ async function paillierTest(req, res) {
   // console.log("xy",x_y)
   // console.log("sq",privateKey.decrypt(x_y));
 
-  // const x = 864
-  // const x_enc = publicKey.encrypt(x)
-  // console.log("test_enc", x_enc)
-  // console.log("text_dec", privateKey.decrypt(x_enc))
-  console.log("text_dec", privateKey.decrypt(a1))
+//   const x_y = publicKey.encrypt(publicKey.multiply(privateKey.decrypt(diff),privateKey.decrypt(pow)));
+//   console.log("xy",x_y)
+//   console.log("sq",privateKey.decrypt(x_y));
+
+//   const x = 864
+//   const x_enc = publicKey.encrypt(x)
+//   console.log("test_enc", x_enc)
+//   console.log("text_dec", privateKey.decrypt(x_enc))
 }
 paillierTest();
