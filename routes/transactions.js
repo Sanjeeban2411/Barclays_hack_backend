@@ -4,7 +4,7 @@ const paillier = require("paillier-bigint");
 const userDetail = require("../db/Schema/userDetails");
 const bcrypt = require("bcryptjs");
 
-const router = new express.Router();
+const router = new express.Router(); 
 
 router.get("/paillier/generatekeys", async (req, res) => {
   const { publicKey, privateKey } = await paillier.generateRandomKeys(64);

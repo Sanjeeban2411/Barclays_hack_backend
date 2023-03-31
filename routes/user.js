@@ -60,7 +60,7 @@ router.post("/signUp", async (req, res) => {
         // sender:"dim329r8",
         receiver:req.body.transactionKey,
         encrypted_value:{x1:enc_value,x2:null},
-        receiver_balance:"iwecniu"
+        receiver_balance:enc_value
     })
     transLog.save()
 
