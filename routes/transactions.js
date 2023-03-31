@@ -98,7 +98,7 @@ const privateKey = new paillier.PrivateKey(pvt_key1.lambda, pvt_key1.mu, publicK
 console.log(privateKey)
   trans.forEach(element => {
 
-    enc_transactionAmt = BigInt(element.encrypted_value.x1)
+    enc_transactionAmt = BigInt(atob(element.encrypted_value.x1))
     transactionAmt = privateKey.decrypt(enc_transactionAmt)
     enc_bal = BigInt(element.receiver_balance)
     bal = privateKey.decrypt(enc_bal)
