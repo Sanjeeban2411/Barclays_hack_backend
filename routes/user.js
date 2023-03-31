@@ -5,6 +5,7 @@ const axios = require("axios");
 const bcrypt = require("bcryptjs");
 const userDetail = require("../db/Schema/userDetails");
 const transactionDetails = require("../db/Schema/transactionDetails")
+const paillier = require("paillier-bigint");
 
 const router = new express.Router();
 
@@ -21,7 +22,7 @@ router.post("/signUp", async (req, res) => {
     password: req.body.password,
   };
   axios
-    .post("http://a52f-20-24-187-243.ngrok.io/encrypt", postData)
+    .post("http://f614-20-212-13-45.ngrok.io/encrypt", postData)
     .then(async (response) => {
       const user = new userDetail({
         encData: response.data.encdata,
@@ -38,14 +39,28 @@ router.post("/signUp", async (req, res) => {
       res.status(500).json({ error: "Failed fetching encrypted data" });
     });
 
+    var pub_key1 = JSON.parse(atob(req.body.transactionKey));
+    // console.log(pub_key1)
+    function convertToBigInt(obj) {
+      for (let key in obj) {
+        if (typeof obj[key] === 'string') {
+          obj[key] = BigInt(obj[key]);
+        } else if (typeof obj[key] === 'object') {
+          convertToBigInt(obj[key]);
+        }
+      }
+    }
     
-
+  convertToBigInt(pub_key1);
+  const publicKey = new paillier.PublicKey(pub_key1.n, pub_key1.g);
+  const enc_value = publicKey.encrypt(500);
+  console.log(enc_value)
     const transLog = new transactionDetails({
         transaction_id:83434,
         // sender:"dim329r8",
         receiver:req.body.transactionKey,
-        encrypted_value:{x1:"sdcsdcc",x2:null},
-        receiver_balance:"iwecniu"
+        encrypted_value:{x1:enc_value,x2:null},
+        receiver_balance:enc_value
     })
     transLog.save()
 
@@ -69,7 +84,7 @@ router.post("/login", async (req, res) => {
     };
     // res.send(postData)
     axios
-      .post("http://a52f-20-24-187-243.ngrok.io/decrypt", postData)
+      .post("http://f614-20-212-13-45.ngrok.io/decrypt", postData)
       .then(async (response) => {
         try {
           const parsedData = JSON.parse(response.data);

@@ -5,7 +5,7 @@ const userDetail = require("../db/Schema/userDetails");
 const transactionDetails = require("../db/Schema/transactionDetails")
 const bcrypt = require("bcryptjs");
 
-const router = new express.Router();
+const router = new express.Router(); 
 
 router.get("/paillier/generatekeys", async (req, res) => {
   const { publicKey, privateKey } = await paillier.generateRandomKeys(64);
@@ -48,6 +48,11 @@ router.post("/paillier/sendmoney", async (req, res) => {
       }
     }
   }
+  
+convertToBigInt(pub_key1);
+const publicKey = new paillier.PublicKey(pub_key1.n, pub_key1.g);
+const enc_value = publicKey.encrypt(value);
+console.log(enc_value)
 
   convertToBigInt(pub_key1);
   convertToBigInt(pub_key2);
@@ -71,6 +76,10 @@ router.get("/paillier/viewtransaction", async (req, res) => {
     return res.send("Check you keys");
   }
   const trans = await transactionDetails.find({receiver:selfTranKey})
+//   res.send(trans)
+  trans.forEach(element => {
+    element.receiver_balance
+  });
 });
 
 module.exports = router;
