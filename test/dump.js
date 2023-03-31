@@ -30,8 +30,8 @@ app.get("/generatekeys", async function paillierTest(req, res) {
   res.send({ outputPub, outputPvt });
 });
 
-app.listen(8000, () => {
-  console.log("listening on 8000");
+app.listen(8080, () => {
+  console.log("listening on 8080");
 });
 
 // async function paillierTest(req, res) {
