@@ -82,14 +82,14 @@ router.post("/paillier/sendmoney", async (req, res) => {
   const transactionKey = req.body.transactionKey; //(reciever pub key) manually entered
   const selfTranKey = req.body.selfTranKey; //(sender pub key)
   const hashKey = req.body.hashKey; //hasked pvt key of sender fro  db
-  const pvt_key = req.body.pvt_key; //manualy
+//   const pvt_key = req.body.pvt_key; //manualy
   const isMatch = await bcrypt.compare(req.body.pvtKey, hashKey);
-
   if (!isMatch) {
     return res.send("Check you keys");
   }
+//   res.send("hi")
 
-  const value = 500;
+  const value = 200;
   var pub_key1 = JSON.parse(atob(req.body.transactionKey));
   var pub_key2 = JSON.parse(atob(req.body.selfTranKey));
   function convertToBigInt(obj) {
@@ -107,8 +107,17 @@ router.post("/paillier/sendmoney", async (req, res) => {
   const publicKey1 = new paillier.PublicKey(pub_key1.n, pub_key1.g);
   const publicKey2 = new paillier.PublicKey(pub_key2.n, pub_key2.g);
 
-  const senderDecrementValue = (publicKey1.encrypt(val));
-  const recieverIncrementValue = (publicKey2.encrypt(val));
+  const senderDecrementValue = (publicKey1.encrypt(value));
+  const recieverIncrementValue = (publicKey2.encrypt(value));
+
+  const senderTrans = await transactionDetails.find({$or: [{sender: selfTranKey},
+  {receiver: selfTranKey}]})
+  const sender_balance = senderTrans[senderTrans.length-1].receiver_balance
+
+  const recieveTrans = await transactionDetails.find({$or: [{sender: transactionKey},
+  {receiver: transactionKey}]})
+  const receiver_balance = recieveTrans[recieveTrans.length-1].receiver_balance
+  res.send({sender_balance, receiver_balance})
 
 
 

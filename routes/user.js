@@ -23,7 +23,7 @@ router.post("/signUp", async (req, res) => {
       password: req.body.password,
     };
     axios
-      .post("http://f614-20-212-13-45.ngrok.io/encrypt", postData)
+      .post("http://228b-4-193-172-238.ngrok.io/encrypt", postData)
       .then(async (response) => {
         const user = new userDetail({
           encData: response.data.encdata,
@@ -91,7 +91,7 @@ router.post("/login", async (req, res) => {
     };
     // res.send(postData)
     axios
-      .post("http://f614-20-212-13-45.ngrok.io/decrypt", postData)
+      .post("http://228b-4-193-172-238.ngrok.io/decrypt", postData)
       .then(async (response) => {
         try {
           const parsedData = JSON.parse(response.data);
