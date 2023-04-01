@@ -3,9 +3,9 @@ const express = require("express");
 require("./db/mongo")
 const userRoutes = require('./routes/user')
 const transactionRoutes = require('./routes/transactions')
-// var cors = require('cors');
+var cors = require('cors');
 const app = express();
-// app.use(cors());
+app.use(cors());
 
 
 // app.get("/generatekeys", async function paillierTest(req, res) {
