@@ -41,15 +41,16 @@ let b = 100;
 
 
 const a1 = publicKey.encrypt(a);
-const b1 = publicKey.encrypt(b);
+console.log("a1 :", a1)
+// const b1 = publicKey.encrypt(b);
 
 
 
-const sum = publicKey.addition(a1, b1)
-console.log(sum)
+// const sum = publicKey.addition(a1, b1)
+// console.log(sum)
 
 
-const decryptedA = privateKey.decrypt(sum);
+const decryptedA = privateKey.decrypt(a1);
 
   
   console.log(decryptedA);

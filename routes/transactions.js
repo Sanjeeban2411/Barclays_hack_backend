@@ -90,6 +90,7 @@ router.post("/paillier/sendmoney", async (req, res) => {
 //   res.send("hi")
 
   const value = 200;
+  // console.log(-value)
   var pub_key1 = JSON.parse(atob(req.body.transactionKey));
   var pub_key2 = JSON.parse(atob(req.body.selfTranKey));
   function convertToBigInt(obj) {
@@ -106,9 +107,8 @@ router.post("/paillier/sendmoney", async (req, res) => {
 
   const publicKey1 = new paillier.PublicKey(pub_key1.n, pub_key1.g);
   const publicKey2 = new paillier.PublicKey(pub_key2.n, pub_key2.g);
-
-  const senderDecrementValue = -(publicKey1.encrypt(value));
-  const recieverIncrementValue = (publicKey2.encrypt(value));
+  const senderDecrementValue = (publicKey2.encrypt((-value)));
+  const recieverIncrementValue = (publicKey1.encrypt(value));
 
   const senderTrans = await transactionDetails.find({$or: [{sender: selfTranKey},
   {receiver: selfTranKey}]})
@@ -118,17 +118,21 @@ router.post("/paillier/sendmoney", async (req, res) => {
   {receiver: transactionKey}]})
   const receiver_balance = recieveTrans[recieveTrans.length-1].receiver_balance
   
-  // sender_bal = atob(sender_balance)
+  const private_Key = JSON.parse(atob(req.body.pvtKey))
+
+  convertToBigInt(private_Key)
+  const privateKey = new paillier.PrivateKey(private_Key.lambda, private_Key.mu, publicKey2, private_Key._p, private_Key._q )
+  // console.log(privateKey)
   sender_bal = BigInt(sender_balance)
   recevier_bal = BigInt(receiver_balance)
+ 
 
   receiver_new_bal = publicKey1.addition(recevier_bal,recieverIncrementValue)
-  sender_new_bal = publicKey1.addition(sender_bal, senderDecrementValue)
+  sender_new_bal = publicKey2.addition(sender_bal, senderDecrementValue)
+  dec_s_b = privateKey.decrypt(sender_new_bal)
+  console.log(dec_s_b)
 
-  console.log(receiver_new_bal, sender_new_bal)
   res.send({sender_balance, receiver_balance})
-
-
 
 });
 
