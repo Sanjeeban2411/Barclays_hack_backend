@@ -107,7 +107,7 @@ router.post("/paillier/sendmoney", async (req, res) => {
   const publicKey1 = new paillier.PublicKey(pub_key1.n, pub_key1.g);
   const publicKey2 = new paillier.PublicKey(pub_key2.n, pub_key2.g);
 
-  const senderDecrementValue = (publicKey1.encrypt(value));
+  const senderDecrementValue = -(publicKey1.encrypt(value));
   const recieverIncrementValue = (publicKey2.encrypt(value));
 
   const senderTrans = await transactionDetails.find({$or: [{sender: selfTranKey},
@@ -117,6 +117,15 @@ router.post("/paillier/sendmoney", async (req, res) => {
   const recieveTrans = await transactionDetails.find({$or: [{sender: transactionKey},
   {receiver: transactionKey}]})
   const receiver_balance = recieveTrans[recieveTrans.length-1].receiver_balance
+  
+  // sender_bal = atob(sender_balance)
+  sender_bal = BigInt(sender_balance)
+  recevier_bal = BigInt(receiver_balance)
+
+  receiver_new_bal = publicKey1.addition(recevier_bal,recieverIncrementValue)
+  sender_new_bal = publicKey1.addition(sender_bal, senderDecrementValue)
+
+  console.log(receiver_new_bal, sender_new_bal)
   res.send({sender_balance, receiver_balance})
 
 
