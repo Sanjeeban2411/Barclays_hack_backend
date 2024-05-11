@@ -39,6 +39,7 @@ router.get("/paillier/viewtransaction", async (req, res) => {
     return res.send("Check you keys");
   }
   const trans = await transactionDetails.find({ receiver: selfTranKey });
+//   const trans = await transactionDetails.find({$or: [{sender: selfTranKey},{receiver: selfTranKey}]});
   //   res.send(trans)
   var pvt_key1 = JSON.parse(atob(req.body.pvtKey));
   var pub_key1 = JSON.parse(atob(req.body.selfTranKey));
@@ -89,7 +90,7 @@ router.post("/paillier/sendmoney", async (req, res) => {
   }
 //   res.send("hi")
 
-  const value = 200;
+  const value = req.body.value;
   // console.log(-value)
   var pub_key1 = JSON.parse(atob(req.body.transactionKey));
   var pub_key2 = JSON.parse(atob(req.body.selfTranKey));
@@ -108,7 +109,7 @@ router.post("/paillier/sendmoney", async (req, res) => {
   const publicKey1 = new paillier.PublicKey(pub_key1.n, pub_key1.g);
   const publicKey2 = new paillier.PublicKey(pub_key2.n, pub_key2.g);
   const senderDecrementValue = (publicKey2.encrypt((-value)));
-  const posSenderValue = (publicKey2.encrypt(value));
+  const positiveSenderValue = (publicKey2.encrypt(value));
   const recieverIncrementValue = (publicKey1.encrypt(value));
 
   const senderTrans = await transactionDetails.find({$or: [{sender: selfTranKey},
@@ -129,18 +130,23 @@ router.post("/paillier/sendmoney", async (req, res) => {
  
 
   receiver_new_bal = publicKey1.addition(recevier_bal,recieverIncrementValue)
-  sender_new_bal = publicKey2.addition(sender_bal, senderDecrementValue)
+  sender_new_bal = (publicKey2.addition(sender_bal, senderDecrementValue))
   dec_s_b = privateKey.decrypt(sender_new_bal)
   console.log(dec_s_b)
 
-  const transLog = {
+  const recieverIncrement = btoa(recieverIncrementValue)
+  const senderDecrement = btoa(positiveSenderValue)
+  const transLog = new transactionDetails( {
     transaction_id:"2432525",
     sender: selfTranKey,
     receiver: transactionKey,
-    encrypted_value:{}
-  }
+    encrypted_value:{x1:recieverIncrement, x2:senderDecrement},
+    sender_balance: sender_new_bal,
+    receiver_balance: receiver_new_bal
+  })
+  await transLog.save()
 
-  res.send({sender_balance, receiver_balance})
+  res.send(transLog)
 
 });
 

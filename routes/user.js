@@ -1,6 +1,5 @@
 const express = require("express");
 const request = require("request");
-// const mongoose = require('mongoose')
 const axios = require("axios");
 const bcrypt = require("bcryptjs");
 const userDetail = require("../db/Schema/userDetails");
@@ -23,7 +22,7 @@ router.post("/signUp", async (req, res) => {
       password: req.body.password,
     };
     axios
-      .post("http://228b-4-193-172-238.ngrok.io/encrypt", postData)
+      .post("https://barclays.onrender.com/encrypt", postData)
       .then(async (response) => {
         const user = new userDetail({
           encData: response.data.encdata,
@@ -40,12 +39,10 @@ router.post("/signUp", async (req, res) => {
         });
       })
       .catch((error) => {
-        //   console.error(error);
         res.status(500).json({ error: "Failed fetching encrypted data" });
       });
 
     var pub_key1 = JSON.parse(atob(req.body.transactionKey));
-    // console.log(pub_key1)
     function convertToBigInt(obj) {
       for (let key in obj) {
         if (typeof obj[key] === "string") {
@@ -62,7 +59,6 @@ router.post("/signUp", async (req, res) => {
     const enc_x1 = btoa(publicKey.encrypt(500));
     const transLog = new transactionDetails({
       transaction_id: 83434,
-      // sender:"dim329r8",
       receiver: req.body.transactionKey,
       encrypted_value: { x1: enc_x1, x2: null },
       receiver_balance: enc_value,
@@ -89,13 +85,11 @@ router.post("/login", async (req, res) => {
       nonce_: user.nonce,
       tag_: user.tag,
     };
-    // res.send(postData)
     axios
-      .post("http://228b-4-193-172-238.ngrok.io/decrypt", postData)
+      .post("https://barclays.onrender.com/decrypt", postData)
       .then(async (response) => {
         try {
           const parsedData = JSON.parse(response.data);
-          // console.log(parsedData.Password)
           if (parsedData.Password !== req.body.password) {
             return res.send("Wrong Credentials");
           }
@@ -104,16 +98,11 @@ router.post("/login", async (req, res) => {
           res.send({ error: "error" });
         }
       })
-      // res.send(user)
       .catch((error) => {
         console.error(error);
         res.status(500).json({ error: "Failed fetching encrypted data" });
       });
 
-    // res.send({user})
-    // call API-2 with (encrypted data, key, nonce, tag, req.body.pvtKey)
-    // returns all user data along with password
-    // verify password
   } catch (error) {
     res.send(error);
   }
