@@ -15,6 +15,9 @@ const StaticSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+    hash_key:{
+        type:String
+    },
     nonce:{
         type:String,
         required:true
